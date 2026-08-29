@@ -47,6 +47,11 @@ def extract_intent(
     for attempt in range(max_repair + 1):
         try:
             parsed = _parse_json_object(raw_output)
+            parsed = _normalize_low_confidence_target(
+                parsed,
+                confidence_threshold=confidence_threshold,
+                fail_closed=fail_closed,
+            )
             result = validate_intent(parsed)
             return _apply_confidence_policy(
                 result,
@@ -75,6 +80,40 @@ def _parse_json_object(raw_output: str) -> dict[str, Any]:
     if not isinstance(parsed, dict):
         raise TypeError("LLM output must decode to a JSON object.")
     return parsed
+
+
+def _normalize_low_confidence_target(
+    parsed: dict[str, Any],
+    *,
+    confidence_threshold: float,
+    fail_closed: bool,
+) -> dict[str, Any]:
+    """Turn an uncertain missing-target response into a valid clarification result."""
+
+    confidence = parsed.get("confidence")
+    target = parsed.get("target")
+    if (
+        not fail_closed
+        or parsed.get("needs_clarification") is not False
+        or not isinstance(confidence, (int, float))
+        or isinstance(confidence, bool)
+        or confidence >= confidence_threshold
+        or not isinstance(target, dict)
+    ):
+        return parsed
+
+    has_room = bool(target.get("room") and str(target["room"]).strip())
+    has_entity_id = bool(
+        target.get("entity_id") and str(target["entity_id"]).strip()
+    )
+    if has_room or has_entity_id:
+        return parsed
+
+    return {
+        **parsed,
+        "needs_clarification": True,
+        "clarification_question": "Which room did you mean?",
+    }
 
 
 def _apply_confidence_policy(
