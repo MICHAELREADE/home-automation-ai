@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, ValidationError
+from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
 
 IntentName = Literal[
@@ -47,6 +47,18 @@ class IntentResult(BaseModel):
     confidence: float = Field(ge=0.0, le=1.0)
     needs_clarification: bool
     clarification_question: str | None
+
+    @model_validator(mode="after")
+    def require_target_when_not_clarifying(self) -> "IntentResult":
+        """Require a room or entity ID for actionable, non-ambiguous intents."""
+
+        has_room = bool(self.target.room and self.target.room.strip())
+        has_entity_id = bool(self.target.entity_id and self.target.entity_id.strip())
+        if not self.needs_clarification and not (has_room or has_entity_id):
+            raise ValueError(
+                "target.room or target.entity_id is required when clarification is not needed."
+            )
+        return self
 
 
 def validate_intent(obj: dict) -> IntentResult:

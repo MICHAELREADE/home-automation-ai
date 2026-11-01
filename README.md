@@ -34,6 +34,27 @@ It does **not** directly control devices.
 
 ## 🏗 Architecture Overview
 
+```mermaid
+flowchart TD
+    A["Typed user input"] --> B["handle_typed_input<br/>app/core/input_handler.py"]
+    B --> C["extract_intent<br/>app/llm/intent_extractor.py"]
+    C --> D["get_intent_json_schema<br/>app/llm/schema.py"]
+    C --> E["build_intent_extraction_prompt<br/>app/llm/prompts.py"]
+    C --> F["LLMClient.call(prompt)<br/>app/llm/llm_client.py"]
+    F --> G["Raw LLM output"]
+    G --> H["Parse JSON"]
+    H --> I["validate_intent<br/>app/llm/schema.py"]
+    I --> J["IntentResult"]
+    J --> K["IntentTarget"]
+    J --> L["IntentParams"]
+    I --> M{Valid and above threshold?}
+    M -- Yes --> N["Return validated intent"]
+    M -- No --> O{Repair available?}
+    O -- Yes --> P["build_repair_prompt<br/>app/llm/prompts.py"]
+    P --> F
+    O -- No --> Q["Fail closed with clarification"]
+```
+
 Two-machine design:
 
 ### 1️⃣ Home Assistant Node (Raspberry Pi)

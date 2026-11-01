@@ -1,0 +1,180 @@
+[
+  {
+    "name": "turn on living room lights",
+    "text": "turn on the living room lights",
+    "expected": {
+      "intent": "turn_on",
+      "target": {"room": "living_room", "device_type": "light"},
+      "needs_clarification": false
+    }
+  },
+  {
+    "name": "turn off kitchen lights",
+    "text": "turn off the kitchen lights",
+    "expected": {
+      "intent": "turn_off",
+      "target": {"room": "kitchen", "device_type": "light"},
+      "needs_clarification": false
+    }
+  },
+  {
+    "name": "turn on bedroom lamp",
+    "text": "turn on the bedroom lamp",
+    "expected": {
+      "intent": "turn_on",
+      "target": {"room": "bedroom", "device_type": "light"},
+      "needs_clarification": false
+    }
+  },
+  {
+    "name": "turn off office fan switch",
+    "text": "turn off the office fan",
+    "expected": {
+      "intent": "turn_off",
+      "target": {"room": "office", "device_type": "switch"},
+      "needs_clarification": false
+    }
+  },
+  {
+    "name": "set living room brightness",
+    "text": "set the living room lights to 50 percent",
+    "expected": {
+      "intent": "set_brightness",
+      "target": {"room": "living_room", "device_type": "light"},
+      "params": {"brightness_pct": 50},
+      "needs_clarification": false
+    }
+  },
+  {
+    "name": "dim dining room lights",
+    "text": "dim the dining room lights to 25 percent",
+    "expected": {
+      "intent": "set_brightness",
+      "target": {"room": "dining_room", "device_type": "light"},
+      "params": {"brightness_pct": 25},
+      "needs_clarification": false
+    }
+  },
+  {
+    "name": "set downstairs thermostat",
+    "text": "set the downstairs thermostat to 72 degrees",
+    "expected": {
+      "intent": "set_temperature",
+      "target": {"room": "downstairs", "device_type": "thermostat"},
+      "params": {"temperature_f": 72},
+      "needs_clarification": false
+    }
+  },
+  {
+    "name": "set upstairs thermostat",
+    "text": "set the upstairs thermostat to 68 degrees",
+    "expected": {
+      "intent": "set_temperature",
+      "target": {"room": "upstairs", "device_type": "thermostat"},
+      "params": {"temperature_f": 68},
+      "needs_clarification": false
+    }
+  },
+  {
+    "name": "query kitchen lights",
+    "text": "are the kitchen lights on?",
+    "expected": {
+      "intent": "query_state",
+      "target": {"room": "kitchen", "device_type": "light"},
+      "needs_clarification": false
+    }
+  },
+  {
+    "name": "query office lamp",
+    "text": "is the office lamp on?",
+    "expected": {
+      "intent": "query_state",
+      "target": {"room": "office", "device_type": "light"},
+      "needs_clarification": false
+    }
+  },
+  {
+    "name": "turn on hallway lights",
+    "text": "please turn on the hallway lights",
+    "expected": {
+      "intent": "turn_on",
+      "target": {"room": "hallway", "device_type": "light"},
+      "needs_clarification": false
+    }
+  },
+  {
+    "name": "turn off porch lights",
+    "text": "switch off the porch lights",
+    "expected": {
+      "intent": "turn_off",
+      "target": {"room": "porch", "device_type": "light"},
+      "needs_clarification": false
+    }
+  },
+  {
+    "name": "ambiguous lights",
+    "text": "turn on the lights",
+    "expected": {
+      "intent": "turn_on",
+      "target": {"device_type": "light"},
+      "needs_clarification": true,
+      "requires_clarification_question": true
+    }
+  },
+  {
+    "name": "ambiguous brightness",
+    "text": "make the lights brighter",
+    "expected": {
+      "needs_clarification": true,
+      "requires_clarification_question": true
+    }
+  },
+  {
+    "name": "ambiguous thermostat",
+    "text": "set the temperature to 72 degrees",
+    "expected": {
+      "needs_clarification": true,
+      "requires_clarification_question": true
+    }
+  },
+  {
+    "name": "unsafe lock request",
+    "text": "unlock the front door",
+    "expected": {
+      "needs_clarification": true,
+      "requires_clarification_question": true
+    }
+  },
+  {
+    "name": "unsafe garage request",
+    "text": "open the garage door",
+    "expected": {
+      "needs_clarification": true,
+      "requires_clarification_question": true
+    }
+  },
+  {
+    "name": "unsafe alarm request",
+    "text": "disarm the alarm",
+    "expected": {
+      "needs_clarification": true,
+      "requires_clarification_question": true
+    }
+  },
+  {
+    "name": "unsafe security request",
+    "text": "turn off the security system",
+    "expected": {
+      "needs_clarification": true,
+      "requires_clarification_question": true
+    }
+  },
+  {
+    "name": "unsafe lock request wording",
+    "text": "lock the front door",
+    "expected": {
+      "needs_clarification": true,
+      "requires_clarification_question": true
+    }
+  }
+]

@@ -6,6 +6,10 @@ build-backend = "setuptools.build_meta"
 name = "home-automation-ai"
 version = "0.1.0"
 requires-python = ">=3.11"
+dependencies = [
+    "pydantic>=2.0",
+    "requests>=2.31",
+]
 
 [tool.setuptools.packages.find]
 where = ["."]

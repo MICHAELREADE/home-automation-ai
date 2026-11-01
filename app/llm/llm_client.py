@@ -4,7 +4,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 import time
-from typing import Any, Callable, Protocol
+from typing import Any, Callable, Mapping, Protocol
+
+from app.llm import config
 
 
 class BackendCallable(Protocol):
@@ -54,6 +56,7 @@ def create_http_backend(
     model: str,
     timeout_seconds: float = 30.0,
     session: Any = None,
+    request_options: Mapping[str, Any] | None = None,
 ) -> BackendCallable:
     """Create a simple JSON-over-HTTP backend for local LLM runtimes."""
 
@@ -65,9 +68,12 @@ def create_http_backend(
     http_session = session or requests.Session()
 
     def _call(prompt: str) -> str:
+        payload = {"model": model, "prompt": prompt}
+        if request_options:
+            payload.update(request_options)
         response = http_session.post(
             url,
-            json={"model": model, "prompt": prompt},
+            json=payload,
             timeout=timeout_seconds,
         )
         response.raise_for_status()
@@ -79,3 +85,48 @@ def create_http_backend(
         raise RuntimeError("HTTP backend response did not contain `response` or `text`.")
 
     return _call
+
+
+def create_ollama_backend(
+    *,
+    base_url: str = config.OLLAMA_BASE_URL,
+    model: str = config.OLLAMA_MODEL,
+    timeout_seconds: float = config.OLLAMA_TIMEOUT_SECONDS,
+    session: Any = None,
+) -> BackendCallable:
+    """Create an Ollama-compatible backend using the local generate endpoint."""
+
+    url = f"{base_url.rstrip('/')}{config.OLLAMA_GENERATE_PATH}"
+    return create_http_backend(
+        url,
+        model=model,
+        timeout_seconds=timeout_seconds,
+        session=session,
+        request_options={"stream": False},
+    )
+
+
+def create_ollama_client(
+    *,
+    base_url: str | None = None,
+    model: str | None = None,
+    timeout_seconds: float = config.OLLAMA_TIMEOUT_SECONDS,
+    max_retries: int = config.OLLAMA_MAX_RETRIES,
+    backoff_seconds: float = config.OLLAMA_BACKOFF_SECONDS,
+    session: Any = None,
+) -> LLMClient:
+    """Create an `LLMClient` configured for a local Ollama runtime."""
+
+    resolved_base_url = base_url or config.OLLAMA_BASE_URL
+    resolved_model = model or config.OLLAMA_MODEL
+    return LLMClient(
+        backend=create_ollama_backend(
+            base_url=resolved_base_url,
+            model=resolved_model,
+            timeout_seconds=timeout_seconds,
+            session=session,
+        ),
+        timeout_seconds=timeout_seconds,
+        max_retries=max_retries,
+        backoff_seconds=backoff_seconds,
+    )

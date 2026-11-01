@@ -71,6 +71,20 @@ def test_validate_intent_rejects_unsupported_device_type() -> None:
         validate_intent(payload)
 
 
+def test_validate_intent_requires_target_without_clarification() -> None:
+    payload = {
+        "intent": "turn_on",
+        "target": {"room": None, "entity_id": None, "device_type": "light"},
+        "params": {"brightness_pct": None, "temperature_f": None},
+        "confidence": 0.92,
+        "needs_clarification": False,
+        "clarification_question": None,
+    }
+
+    with pytest.raises(ValidationError, match="target.room or target.entity_id"):
+        validate_intent(payload)
+
+
 def test_json_schema_exposes_expected_top_level_fields() -> None:
     schema = get_intent_json_schema()
 
